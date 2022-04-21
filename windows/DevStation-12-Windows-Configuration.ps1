@@ -1,13 +1,3 @@
-#Check which OS we're running
-#6.3.9600 = 2012 r2
-#10.0.14393 = 2016
-#10.0.17744 = 2019
-$OS = (Get-CimInstance Win32_OperatingSystem).version
-Write-Host "Windows Version: $OS"
-
-#Check if Full or Core,  1 for Full, 2 for Core
-$Core = (Get-WMIObject Win32_OptionalFeature | where Name -eq 'Server-Gui-Shell').InstallState
-if($Core -eq 1){ Write-Host "Standard Windows Installation" }else{Write-Host "Server Core Installation"}
 
 function SetRegistryValue {
     param($Path, $Key="", $Value="", $Type="", [switch]$Create = $false)
@@ -38,7 +28,8 @@ function SetRegistryValue {
 switch($OS){
     "10.0.17744"{Write-Output "Entered Switch Case for Server 2019"}
     "10.0.14393"{Write-Output "Entered Switch Case for Server 2016"}
-    "6.3.9600"{Write-Output "Entered Switch Case for Server 2012"
+    "6.3.9600"{Write-Output "Entered Switch Case for Server 2012"}
+    "10.0.19044"{Write-Output "Entered Switch Case for Windows 10"
         Write-Host "`nOptimize EWF (Enhanced Write Filter)" 
         SetRegistryValue 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\OptimalLayout' 'EnableAutoLayout' '0' 'String' -Create
         SetRegistryValue 'HKLM:\SYSTEM\CurrentControlSet\Control\CrashControl' 'CrashDumpEnabled' '0' 'String' -Create
@@ -48,32 +39,7 @@ switch($OS){
         SetRegistryValue 'HKLM:\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction' 'Enable' 'N' 'String' -Create
         SetRegistryValue 'HKLM:\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction' 'Enable' 'N' 'String' -Create
         
-        
-        Write-Host "`nDisabling IE First Run Wizard" 
-        Write-Host "<<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>>"
-        SetRegistryValue 'HKLM:\SOFTWARE\Policies\Microsoft\Internet Explorer\Main' 'DisableFirstRunCustomize' '1'  'DWORD' -Create
-        SetRegistryValue 'HKLM:\SOFTWARE\\Microsoft\Windows\CurrentVersion\Explorer' 'NoPreviousVersionsPage' '1' 'string' -Create
-        SetRegistryValue 'HKLM:\SYSTEM\CurrentControlSet\Control\Network' 'NewNetworkWindowOff' '1' 'string' -Create
-        
-        
-        Write-Host "`nOptimize SMB" 
-        Write-Host "<<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>>"
-        SetRegistryValue 'HKLM:\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters' 'DisableBandwidthThrottling' 'DWORD' '1' -Create
-        SetRegistryValue 'HKLM:\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters' 'DisableLargeMtu' 'DWORD' '0'  -Create
-        SetRegistryValue 'HKLM:\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters' 'FileInfoCacheEntriesMax' 'DWORD' '8000'  -Create
-        SetRegistryValue 'HKLM:\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters' 'DirectoryCacheEntriesMax' 'DWORD' '1000'  -Create
-        SetRegistryValue 'HKLM:\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters' 'FileNotFoundcacheEntriesMax' 'DWORD' '1'  -Create
-        SetRegistryValue 'HKLM:\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters' 'MaxCmds' 'DWORD' '8000'  -Create
-        SetRegistryValue 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters' 'EnableWsd' 'DWORD' '0'  -Create
-        
-        Write-Host "`nDisable TCP Offload" 
-        Write-Host "<<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>>"
-        SetRegistryValue 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters' 'DisableTaskOffload' 'DWORD' '1'  -Create
-        
-        Write-Host "`nDisable Storage Sense" 
-        Write-Host "<<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>>"
-        SetRegistryValue  'HKLM:\SOFTWARE\Policies\Microsoft\Windows\StorageSense' 'AllowStorageSenseGlobal' 'DWORD' '0'  -Create
-        
+                
         Write-Host "`nDisable Install Updates Notification" 
         Write-Host "<<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>><<>>"
         SetRegistryValue 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\MusNotification.exe' 'debugger' 'string' 'rundll32.exe'  -Create
@@ -101,40 +67,6 @@ try {
    Write-Warning "Error setting Paging File size"  -ErrorAction SilentlyContinue
 }
 
-Write-Output "Setting Activation Server"
-if((get-ciminstance softwarelicensingproduct -ComputerName $env:computername -Filter "ApplicationID = '55c92734-d682-4d71-983e-d6ec3f16059f'" | ?{$_.licensestatus -eq 1 }).licensestatus){
-    Write-Output "Windows already activated."
-} else {
-    Write-Output "Setting KMS Server"
-    try{
-    & cscript slmgr.vbs -skms psmad05.hpfod.net
-    } catch {
-        Write-Warning "Error setting KMS server"-ErrorAction SilentlyContinue
-    }
-    
-}
-
-Write-Output "Validating Data Execution Protection settings"
-$dep = (bcdedit.exe /enum | ?{$_ -match "nx"} ).Substring("2").Trim()
-if($dep -ne "AlwaysOn" -and $dep -ne "OptOut"){
-    Write-Output "Correcting DEP to OptOut"
-    try {
-    & bcdedit.exe /set {current} nx OptOut
-    } catch {
-        Write-Warning "Failed to set DEP" -ErrorAction SilentlyContinue
-    }
-}
-
-Write-Output "Optimize Processing for Background Services"
-$BGScore =  (get-Itemproperty 'HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl').Win32PrioritySeparation
-if($BGScore -ne "38" ){
-    try{
-        Write-Output "Setting Process Scheduling to prioritize background services"
-        Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl' -Name Win32PrioritySeparation -Value "38"
-    } catch {
-        Write-Warning "Failed to configure Process Scheduling" -ErrorAction SilentlyContinue
-    }
-}
 
 Write-Output "Configure OS Recovery Options"
 $CrashDump = Get-WmiObject Win32_OSRecoveryConfiguration -EnableAllPrivilege
@@ -160,20 +92,6 @@ if($RDP -ne "0" ){
         Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server' -Name fDenyTSConnections -Value "0"
     } catch {
         Write-Warning "Failed to enable RDP" -ErrorAction SilentlyContinue
-    }
-}
-$RDPAuth =  (get-Itemproperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp').UserAuthentication
-if($RDPAuth -ne "1" ){
-    try{
-        $credssp = (gci c:\Windows\System32\credssp.dll).VersionInfo.ProductVersion
-        if([System.Version]$credssp -ge "6.3.9600.18939"){
-            Write-Output "Enabling RDP NLA"
-            Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name UserAuthentication -Value "1"
-        } else {
-            Write-Output "Skipping Enabling NLA. CredSSP not patched."
-        }
-    } catch {
-        Write-Warning "Failed to enable RDP NLA" -ErrorAction SilentlyContinue
     }
 }
 

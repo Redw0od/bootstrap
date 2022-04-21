@@ -1,13 +1,14 @@
-#Check which OS we're running
-#6.3.9600 = 2012 r2
-#10.0.14393 = 2016
-#10.0.17744 = 2019
+Write-Output ""
+Write-Output "####################################"
+Write-Output "Optimizing Scheduled Tasks"
+Write-Output "####################################"
+
 $OS = (Get-CimInstance Win32_OperatingSystem).version
 Write-Host "Windows Version: $OS"
 
 #Check if Full or Core,  1 for Full, 2 for Core
-$Core = (Get-WMIObject Win32_OptionalFeature | where Name -eq 'Server-Gui-Shell').InstallState
-if($Core -eq 1){ Write-Host "Standard Windows Installation" }else{Write-Host "Server Core Installation"}
+#$Core = (Get-WMIObject Win32_OptionalFeature | where Name -eq 'Server-Gui-Shell').InstallState
+#if($Core -eq 1){ Write-Host "Standard Windows Installation" }else{Write-Host "Server Core Installation"}
 
 $DisableTask = @()
 $DisablePath = @()
@@ -101,19 +102,42 @@ switch($OS){
             'Data Integrity Scan'
             )
     }
+    "10.0.19044" {
+        Write-Output "Disabling Unnecessary Tasks for Windows 10.0.19044"
+        $DisableTask = @(
+            'MicrosoftEdgeUpdateTaskMachine*',
+            'DmClient*',
+            'FODCleanupTask',
+            'MapsToastTask',
+            'WiFiTask',
+            'FamilySafetyMonitor',
+            'FamilySafetyRefreshTask',
+            'ForceSynchronizeTime',
+            'SynchronizeTime*',
+            'Windows Defender Scheduled Scan',
+            'XblGameSaveTask',
+            'SynchronizeTime',
+            'Proxy',
+            'ProactiveScan',
+            'ScheduledDefrag',
+            'GatherNetworkInfo',
+            'MobilityManager',
+            'LPRemove',0
+            'SpaceAgentTask',
+            'MsCtfMonitor',
+            'CacheTask',
+            'uPnpHostConfig',
+            'QueueReporting'
+            )
+
+    }
 }
+
+
+# Disable 'Optimize Start*' and lose text entry in windows search
 
 $DisableTask | %{ SetTask $_ "Disable" }
 $DisablePath | %{ SetTask $_ "Disable" -Path }
 $EnableTask | %{ SetTask $_ "Enable" }
 $EnablePath | %{ SetTask $_ "Enable" -Path }
-
-
-
-
-
-
-
-
-
 

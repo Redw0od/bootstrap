@@ -1,5 +1,9 @@
 # (New-Object System.Net.WebClient).DownloadString('https://github.com/Redw0od/dotfiles/blob/master/.bashrc')
 
+if((get-service winrm).status -ne "Running"){
+    Write-Output "Starting WinRM"
+    Start-Service winrm
+}
 
 #Test WinRM service before calling WSMan settings
 #Assign octopus Variables to Script variables
@@ -67,7 +71,7 @@ if([string]::IsNullOrEmpty($EnableCompatibilityHttpsListener.SourceOfValue) -and
 if([string]::IsNullOrEmpty($ClientBasic.SourceOfValue) -and $ClientBasic.Value -ne $WinRMClientBasic){
     Write-Output "Updating ClientBasic"
     $UpdateWinRM = $true
-    $ClientBasic | Set-Item -Value $WinRMClientBasic
+    $ClientBasic | Set-Item -Value $SettingWinRMClientBasic
 }
 if([string]::IsNullOrEmpty($ClientCredSSP.SourceOfValue) -and $ClientCredSSP.Value -ne $SettingWinRMClientBasic){
     Write-Output "Updating ClientCredSSP"

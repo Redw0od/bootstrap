@@ -1,7 +1,7 @@
 #Install Certificates
 
 if(-Not (Test-Certificate -Cert cert:\LocalMachine\root\7058F03C9972205361782C918C219473CCE853F0)){
-    Import-Certificate -FilePath "\\hpfod.net\NETLOGON\Certificates\PsmCerts01-2039.cer" -CertStoreLocation cert:\LocalMachine\root
+    #Import-Certificate -FilePath "\\hpfod.net\NETLOGON\Certificates\PsmCerts01-2039.cer" -CertStoreLocation cert:\LocalMachine\root
 }
 
 

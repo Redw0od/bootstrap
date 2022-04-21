@@ -1,22 +1,34 @@
-﻿#Octopus Scripts should assign Octopus variables at beginning
+﻿
+Install-WindowsFeature RSAT-AD-Tools
+Install-WindowsFeature UpdateServices-API
 
-# Setup Dev Station
-## Setup WinRM
-### WinRM needs to test service before calling wsman
-## Setup TimeZone
-## Install Chocolatey
-### Call Invoke-Expression as part of Start-Process
-#Firefox Default
-#firefox lastpass
-# Set Explorer to show hidden items and file extensions
-# Disable Driver updates, System -> Hardware -> Device installation
-
-Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform
+sc.exe config wuauserv type= own
 
+get-scheduledtask "BfeOnServiceStartTypeChange" | Disable-ScheduledTask
+get-scheduledtask "Consolidator" | Disable-ScheduledTask
+get-scheduledtask "ProactiveScan" | Disable-ScheduledTask
+get-scheduledtask "QueueReporting" | Disable-ScheduledTask
+get-scheduledtask "RegIdleBackup" | Disable-ScheduledTask
+get-scheduledtask "ResolutionHost" | Disable-ScheduledTask
+get-scheduledtask "ScheduledDefrag" | Disable-ScheduledTask
+get-scheduledtask "StartComponentCleanup" | Disable-ScheduledTask
+get-scheduledtask "TPM-Maintenance" | Disable-ScheduledTask
+Disable-ScheduledTask -TaskName "\Microsoft\Windows\Autochk\Proxy" | Out-Null
+Disable-ScheduledTask -TaskName "\Microsoft\Windows\MemoryDiagnostic\ProcessMemoryDiagnosticEvents" | Out-Null
+Disable-ScheduledTask -TaskName "\Microsoft\Windows\MemoryDiagnostic\RunFullMemoryDiagnostic" | Out-Null
+Disable-ScheduledTask -TaskName "\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem" | Out-Null
+Disable-ScheduledTask -TaskName "\Microsoft\Windows\Ras\MobilityManager" | Out-Null
+Disable-ScheduledTask -TaskName "\Microsoft\Windows\UPnP\UPnPHostConfig" | Out-Null
+
+Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\CrashControl' -Name CrashDumpEnabled -Value '0'
+Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name NtfsDisableLastAccessUpdate -Value '1'
+Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Windows' -Name ErrorMode -Value '2'
+Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Disk' -Name TimeOutValue -Value '0x000000C8'
+New-Item -Path 'HKLM:\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction' -Name Enable -Force
+Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Dfrg\BootOptimizeFunction' -Name Enable -Value 'N'
 
 $Packages = @( 
-    @("Carbon","Carbon","Latest"),
     @("vim","vim","Latest"),
     @("7zip","7zip","Latest"),
     @("sysinternals","sysinternals","Latest"),
@@ -28,55 +40,34 @@ $Packages = @(
     @("firefox","firefox","Latest"),
     @("vlc","vlc","Latest"),
     @("notepadplusplus.install","notepadplusplus.install","Latest"),
-    @("github-desktop","github-desktop","Latest"),
-    @("git.install","git.install","Latest"),
     @("openssh","openssh","Latest"),
     @("ccleaner","ccleaner","Latest"),
     @("foxitreader","foxitreader","Latest"),
     @("filezilla","filezilla","Latest"),
-    @("python","python","Latest"),
     @("dotnetfx","dotnetfx","Latest"),
-    @("winscp.install","winscp.install","Latest"),
     @("dropbox","dropbox","Latest"),
     @("vscode","vscode","Latest"),
-    @("nuget.commandline","nuget.commandline","Latest"),
-    @("wireshark","wireshark","Latest"),
-    @("office365business","office365business","Latest"),
-    @("golang","golang","Latest"),
-    @("microsoft-teams.install","microsoft-teams.install","Latest"),
     @("spotify","spotify","Latest"),
     @("steam","steam","Latest"),
     @("slack","slack","Latest"),
     @("googledrive","googledrive","Latest"),
-    @("terraform","terraform","Latest"),
-    @("pester","pester","Latest"),
     @("cpu-z.install","cpu-z.install","Latest"),
-    @("gpg4win","gpg4win","Latest"),
-    @("pip","pip","Latest"),
-    @("nmap","nmap","Latest"),
     @("lastpass","lastpass","Latest"),
     @("lastpass-chrome","lastpass-chrome","Latest"),
     @("ublockorigin-chrome","ublockorigin-chrome","Latest"),
     @("ublockorigin-firefox","ublockorigin-firefox","Latest"),
-    @("packer","packer","Latest"),
     @("winbox","winbox","Latest"),
-    @("selenium","selenium","Latest"),
-    @("selenium-chrome-driver","selenium-chrome-driver","Latest"),
     @("nvidia-display-driver","nvidia-display-driver","Latest"),
-    @("teamviewer","teamviewer","Latest"),
     @("discord.install","discord.install","Latest"),
-    @("autoit.install","autoit.install","Latest"),
     @("hwinfo.install","hwinfo.install","Latest"),
-    @("google-backup-and-sync","google-backup-and-sync","Latest"),
-    @("sketchup","sketchup","Latest"),
     @("windbg","windbg","Latest"),
-    @("angryip","angryip","Latest"),
     @("wiztree","wiztree","Latest"),
+    @("advanced-ip-scanner","advanced-ip-scanner","Latest"),
     @("intel-dsa","intel-dsa","Latest"),
-    @("epicgameslauncher","epicgameslauncher","Latest"),
-    @("razer-synapse-2","razer-synapse-2","Latest"),
-    @("prey","prey","Latest"),
-    @("cloudberryexplorer.s3","cloudberryexplorer.s3","Latest")
+    @("powertoys","powertoys","Latest"),
+    @("aida64extreme","aida64extreme","Latest"),
+    @("logitechgaming","logitechgaming","Latest"),
+    @("epicgameslauncher","epicgameslauncher","Latest")
     )
 
 Foreach($Package in $Packages){
@@ -98,7 +89,7 @@ Foreach($Package in $Packages){
     }
 
 
-    $chocoArgs = @(" -y")
+    $chocoArgs = @("-y")
     switch($ChocolateyPackageId){
         "vim" {$chocoArgs += (' --params "/NoDesktopShortcuts /NoContextMenu /InstallDir:' + $Env:ChocolateyToolsLocation + '"')}
         "golang" {$chocoArgs += (' -ia INSTALLDIR="' + $Env:ChocolateyToolsLocation + '"\go')}
@@ -230,31 +221,3 @@ get-appxpackage *zune* -allusers | remove-appxpackage
 get-appxpackage *zunevideo* -allusers | remove-appxpackage
 get-appxpackage *people* -allusers | remove-appxpackage
 
-WebpImage
-Todos
-OfficeLens
-RemoteDesktop
-Sway
-NetworkSpeedTest
-GetHelp
-ScreenSketch
-VP9VideoExtensions
-GetStarted
-DesktopAppinstaller
-HEIFImageExtension
-Messaging
-MixedReality
-OneConnect
-Feedbackhub
-YourPhone
-WebMediaExtensions
-
-
-
-
-#Capsule VPN
-start-process ms-windows-store://pdp/?ProductId=9wzdncrdjxtj
-#Debian linux
-start-process ms-windows-store://pdp/?ProductId=9msvkqc78pk6
-#Terminal
-start-process ms-windows-store://pdp/?ProductId=9n0dx20hk701
