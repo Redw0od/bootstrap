@@ -5,84 +5,55 @@ Write-Output "####################################"
 
 $ErrorActionPreference = 'silentlycontinue'
 $Packages = @()
+$WingetPackages = @(
+    @("Go","GoLang.Go","Latest"),
+    @("python","Python.Python.3","Latest"),
+    @("Chrome","Google.Chrome","Latest"),
+    @("notepad\+\+","Notepad++.Notepad++","Latest"),
+    @("FoxitReader","Foxit.FoxitReader","Latest"),
+    @("firefox","Mozilla.Firefox","Latest"),
+    @("ccleaner","Piriform.CCleaner","Latest"),
+    @("filezilla","TimKosse.FileZilla.Client","Latest"),
+    @("dropbox","Dropbox.Dropbox","Latest"),
+    @("VisualStudioCode","Microsoft.VisualStudioCode","Latest"),
+    @("NodeJS","OpenJS.NodeJS","Latest"),
+    @("openvpn","OpenVPNTechnologies.OpenVPNConnect","Latest"),
+    @("openconnect-gui","openconnect-gui","Latest"),
+    @("lens","Mirantis.Lens","Latest"),
+    @("slack","SlackTechnologies.Slack","Latest"),
+    @("Teams","Microsoft.Teams","Latest"),
+    @("Google.Drive","Google.Drive","Latest"),
+    @("lastpass","LogMeIn.LastPass","Latest"),
+    @("windbg","9PGJGD53TN86","Latest"),
+    @("Office","Microsoft.Office","Latest"),
+    @("OneDrive","Microsoft.OneDrive","Latest"),
+    @("AngryIPScanner","angryziber.AngryIPScanner","Latest"),
+    @("PowerToys","Microsoft.PowerToys","Latest"),
+    @("GnuPG","GnuPG.GnuPG","Latest"),
+    @("Docker","Docker.DockerDesktop","Latest"),
+    @("wiztree","AntibodySoftware.WizTree","Latest"),
+    @("anyconnect","9WZDNCRDJ8LH","Latest"))
+
 if ( Get-Command winget ){
-    if ( ! (Get-Command go) ){
-        & winget install GoLang.Go
-    }
-    if ( ! (Get-Command python) ){
-        & winget install Python.Python.3
-    }
-    if ( ! (Get-Command chrome ) ){
-        & winget install Google.Chrome
-    }
-    if ( ! (Get-Command Notepadplusplus ) ){
-        & winget install Notepad++.Notepad++
-    }
-    if ( ! (Get-Command Foxit) ){
-        & winget install Foxit.FoxitReader
-    }
-    if ( ! (Get-Command Firefox ) ){
-        & winget install Mozilla.Firefox
-    }
-    if ( ! (Get-Command CCleaner) ){
-        & winget install Piriform.CCleaner
-    }
-    if ( ! (Get-Command TimKosse.FileZilla.Client) ){
-        & winget install filezilla
-    }
-    if ( ! (Get-Command Dropbox ) ){
-        & winget install Dropbox.Dropbox
-    }
-    if ( ! (Get-Command code ) ){
-        & winget install Microsoft.VisualStudioCode
-    }
-    if ( ! (Get-Command node ) ){
-        & winget install OpenJS.NodeJS
-    }
-    if ( ! (Get-Command openvpn ) ){
-        & winget install OpenVPNTechnologies.OpenVPNConnect
-    }
-    if ( ! (Get-Command Lens ) ){
-        & winget install Mirantis.Lens
-    }
-    if ( ! (Get-Command Slack ) ){
-        & winget install SlackTechnologies.Slack
-    }
-    if ( ! (Get-Command Teams ) ){
-        & winget install Microsoft.Teams
-    }
-    if ( ! (Get-Command Google.Drive ) ){
-        & winget install Google.Drive
-    }
-    if ( ! (Get-Command LastPass ) ){
-        & winget install LogMeIn.LastPass
-    }
-    if ( ! (Get-Command windbg ) ){
-        & winget install 9PGJGD53TN86
-    }
-    if ( ! (Get-Command outlook ) ){
-        & winget install Microsoft.Office
-    }
-    if ( ! (Get-Command onedrive ) ){
-        & winget install Microsoft.OneDrive
-    }
-    if ( ! (Get-Command AngryIPScanner ) ){
-        & winget install angryziber.AngryIPScanner
-    }
-    if ( ! (Get-Command Microsoft.PowerToys ) ){
-        & winget install Microsoft.PowerToys
-    }
-    if ( ! (Get-Command GPG ) ){
-        & winget install GnuPG.GnuPG
-    }
-    if ( ! (Get-Command wiztree ) ){
-        & winget install AntibodySoftware.WizTree
-    }
-    if ( ! (Get-Command docker ) ){
-        & winget install Docker.DockerDesktop
+    ForEach($Package in $WingetPackages){
+    
+        $PackageId = $Package[0]
+        $PackageName = $Package[1]
+        $PackageVersion = $Package[2]
+            
+        if ( ! (winget list | ?{$_ -match $PackageId} ) ){
+            if ( $PackageVersion -ne "Latest") {
+               # Write-Output "winget install --accept-source-agreements --accept-package-agreements $PackageName -v $PackageVersion"
+                & winget install --accept-source-agreements --accept-package-agreements $PackageName -v $PackageVersion
+            }
+            else {
+               # Write-Output "winget install --accept-source-agreements --accept-package-agreements $PackageName"
+                & winget install --accept-source-agreements --accept-package-agreements $PackageName
+            }
+        }
     }
 } 
-elseif( Get-Command choco -erroraction 'silentlycontinue') {
+elseif( Get-Command choco) {
     $Packages = @( 
         @("golang","golang","Latest"),
         @("python","python","Latest"),
@@ -107,14 +78,12 @@ elseif( Get-Command choco -erroraction 'silentlycontinue') {
         @("advanced-ip-scanner","advanced-ip-scanner","Latest"),
         @("powertoys","powertoys","Latest"),
         @("gpg4win","gpg4win","Latest"),
-        @("vim","vim","Latest"),
         @("wiztree","wiztree","Latest")
         )
 }
-
-$Packages = @( 
+exit
+$Packages += @( 
     @("eksctl","eksctl","Latest"),
-    @("openssh","openssh","Latest"),
     @("vscode-kubernetes-tools","vscode-kubernetes-tools","Latest"),
     @("vscode-cloud-code","vscode-cloud-code","Latest"),
     @("vscode-go","vscode-go","Latest"),
@@ -137,7 +106,6 @@ $Packages = @(
     @("ublockorigin-firefox","ublockorigin-firefox","Latest"),
     @("packer","packer","Latest")
     )
-
 
 
 & choco feature disable -n=showDownloadProgress

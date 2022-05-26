@@ -15,118 +15,122 @@ $ErrorActionPreference = 'silentlycontinue'
 $Packages = @()
 if ( Get-Command winget ){
     if ( ! (Get-Command ghub) ){
-        & winget install Logitech.GHUB
+        & winget install --force Logitech.GHUB
     }
     if ( ! (Get-Command chrome) ){
-    & winget install Google.Chrome
+    & winget install --force Google.Chrome
     }
     if ( ! (Get-Command firefox) ){
-    & winget install Mozilla.Firefox
+    & winget install --force Mozilla.Firefox
     }
     if ( ! (Get-Command notepadplusplus) ){
-    & winget install Notepad++.Notepad++
+    & winget install --force Notepad++.Notepad++
     }
     if ( ! (Get-Command foxitreader) ){
-    & winget install Foxit.FoxitReader
+    & winget install --force Foxit.FoxitReader
     }
     if ( ! (Get-Command ccleaner) ){
-    & winget install Piriform.CCleaner
+    & winget install --force Piriform.CCleaner
     }
     if ( ! (Get-Command filezilla) ){
-    & winget install TimKosse.FileZilla.Client
+    & winget install --force TimKosse.FileZilla.Client
     }
     if ( ! (Get-Command lastpass) ){
-    & winget install LogMeIn.LastPass
+    & winget install --force LogMeIn.LastPass
     }
     if ( ! (Get-Command slack) ){
-    & winget install SlackTechnologies.Slack
+    & winget install --force SlackTechnologies.Slack
     }
     if ( ! (Get-Command powertoys) ){
-    & winget install Microsoft.PowerToys
+    & winget install --force Microsoft.PowerToys
     }
     if ( ! (Get-Command steam) ){
-    & winget install Valve.Steam
+    & winget install --force Valve.Steam
     }
     if ( ! (Get-Command discord) ){
-    & winget install Discord.Discord
+    & winget install --force Discord.Discord
     }
     if ( ! (Get-Command wiztree) ){
-    & winget install AntibodySoftware.WizTree
+    & winget install --force AntibodySoftware.WizTree
     }
     if ( ! (Get-Command epic) ){
-    & winget install EpicGames.EpicGamesLauncher
+    & winget install --force EpicGames.EpicGamesLauncher
     }
     if ( ! (Get-Command rdpclient) ){
-    & winget install Microsoft.RemoteDesktopClient
+    & winget install --force Microsoft.RemoteDesktopClient
     }
     if ( ! (Get-Command cpuz) ){
-    & winget install CPUID.CPU-Z
+    & winget install --force CPUID.CPU-Z
     }
     if ( ! (Get-Command cpuz) ){
-    & winget install CPUID.CPU-Z.GBT
+    & winget install --force CPUID.CPU-Z.GBT
     }
     if ( ! (Get-Command aida64) ){
-    & winget install FinalWire.AIDA64.Extreme
+    & winget install --force FinalWire.AIDA64.Extreme
     }
     if ( ! (Get-Command hwinfo) ){
-    & winget install REALiX.HWiNFO
+    & winget install --force REALiX.HWiNFO
     }
     if ( ! (Get-Command hwmonitor) ){
-    & winget install CPUID.HWMonitor
+    & winget install --force CPUID.HWMonitor
     }
     if ( ! (Get-Command powermax) ){
-    & winget install CPUID.powerMAX
+    & winget install --force CPUID.powerMAX
     }
     if ( ! (Get-Command windowsterminal) ){
-    & winget install Microsoft.WindowsTerminal
+    & winget install --force Microsoft.WindowsTerminal
     }
     if ( ! (Get-Command code) ){
-    & winget install Microsoft.VisualStudioCode
+    & winget install --force Microsoft.VisualStudioCode
     }
     if ( ! (Get-Command java) ){
-    & winget install Microsoft.OpenJDK.17
+    & winget install --force Microsoft.OpenJDK.17
+    & winget install --force Oracle.JavaRuntimeEnvironment
     }
     if ( ! (Get-Command qrcode) ){
-    & winget install 9NZFK4DCXMZ4 #QR Code Scanner
+    & winget install --force 9NZFK4DCXMZ4 #QR Code Scanner
     }
     if ( ! (Get-Command netflix) ){
-    & winget install 9WZDNCRFJ3TJ #Neflix
+    & winget install --force 9WZDNCRFJ3TJ #Neflix
     }
     if ( ! (Get-Command spotify) ){
-    & winget install 9NCBCSZSJRSB #Spotify
+    & winget install --force 9NCBCSZSJRSB #Spotify
     }
     if ( ! (Get-Command disney) ){
-    & winget install 9NXQXXLFST89 #Disney+
+    & winget install --force 9NXQXXLFST89 #Disney+
     }
     if ( ! (Get-Command prime) ){
-    & winget install 9P6RC76MSMMJ #Prime Video
+    & winget install --force 9P6RC76MSMMJ #Prime Video
     }
     if ( ! (Get-Command xerox) ){
-    & winget install 9WZDNCRFJ1F8 #Xerox Print and Scan
+    & winget install --force 9WZDNCRFJ1F8 #Xerox Print and Scan
     }
     if ( ! (Get-Command zoom) ){
-    & winget install Zoom.Zoom
+    & winget install --force Zoom.Zoom
     }
     if ( ! (Get-Command obs) ){
-    & winget install OBSProject.OBSStudio
+    & winget install --force OBSProject.OBSStudio
     }
     if ( ! (Get-Command streamlabs) ){
-#   & winget install Streamlabs.StreamlabsOBS
+#   & winget install --force Streamlabs.StreamlabsOBS
     }
     if ( ! (Get-Command mpc) ){
-    & winget install clsid2.mpc-hc
+    & winget install --force clsid2.mpc-hc
     }
     if ( ! (Get-Command minecraftlauncher) ){
-    & winget install Mojang.MinecraftLauncher
+    & winget install --force Mojang.MinecraftLauncher
     }
     if ( ! (Get-Command angryip) ){
-    & winget install angryziber.AngryIPScanner
+    & winget install --force angryziber.AngryIPScanner
     }
     if ( ! (Get-Command pandora) ){
-    & winget install 9WZDNCRFJ46V # Pandora
+    & winget install --force 9WZDNCRFJ46V # Pandora
     }
     if ( ! (Get-Command photos) ){
-    & winget install 9WZDNCRFJBH4 # Microsoft Photos and Video Editor
+    & winget install --force 9WZDNCRFJBH4 # Microsoft Photos and Video Editor
+    }
+    if ( ! (Get-Command paint) ){
+    & winget install --force 9NBLGGH5FV99 # Microsoft Paint 3d
     }
 
     

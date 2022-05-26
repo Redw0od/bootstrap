@@ -16,4 +16,5 @@ powershell.exe ".\DevStation-12-Windows-Configuration.ps1"
 # Store: QR Code Scanner, Xerox Print, Netflix, Prime Video, Disney+
 # Setup Lastpass
 # Install uBlock Origin
+# Sign in OneDrive, map folders, Desktop, Documents, Pictures
 
